@@ -14,7 +14,7 @@ A specialized Data Engineering Agent designed to retrieve the most recent insigh
 4. `reflex init`
 5. `reflex run`
 
-Default will open the UI in localhost:3000
+Default will open the UI in http://localhost:3000
 
 6. Ask you question like
  __Share me recent news around foundation db__

@@ -1,0 +1,12 @@
+*.py[cod]
+.web
+__pycache__/
+reflex.db
+*/*.ipynb
+*.ipynb
+.DS_Store
+*.DS_Store
+.idea/
+*.idea/*
+alembic/versions/*
+*alembic/versions

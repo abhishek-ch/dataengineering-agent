@@ -1,0 +1,8 @@
+pydantic
+requests
+tenacity
+openai
+termcolor
+python-dotenv
+streamlit
+reflex

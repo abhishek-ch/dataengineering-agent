@@ -10,7 +10,7 @@ from deagent.openaichat_util import chat_completion_with_function_execution
 from deagent.functions import *
 # from deagent.state import *
 
-openai.api_key = ""
+openai.api_key = "sk-r"
 MAX_QUESTIONS = 10
 
 

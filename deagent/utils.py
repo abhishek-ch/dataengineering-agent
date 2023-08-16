@@ -5,7 +5,7 @@ import os
 import openai
 import requests
 
-openai.api_key = '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'
+openai.api_key = ''
 GPT_MODEL = "gpt-3.5-turbo-0613"  # "gpt-4-0613"
 
 
@@ -20,8 +20,8 @@ def chat_completion_request(messages: str, functions: List[str] = None,
     json_data = {"model": model, "messages": messages}
     if functions is not None:
         json_data.update({"functions": functions})
-    if function_call is not None:
-        json_data.update({"function_call": function_call})
+    # if function_call is not None:
+    json_data.update({"function_call": {"name":"search_query_by_date"}})
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",

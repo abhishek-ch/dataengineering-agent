@@ -9,7 +9,7 @@ from typing import Optional
 from deagent.openaichat_util import chat_completion_with_function_execution
 from deagent.functions import *
 
-openai.api_key = "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"
+openai.api_key = "sk    F "
 MAX_QUESTIONS = 10
 
 

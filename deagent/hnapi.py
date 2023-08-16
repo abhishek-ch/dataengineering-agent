@@ -1,10 +1,10 @@
-import requests
-from deagent.models import *
-from deagent.comment import *
-import json
 import html
+
+import requests
 from bs4 import BeautifulSoup
-from typing import Any, Union, Dict, List
+
+from deagent.comment import *
+from deagent.models import *
 
 
 def clean_html_data(data: str) -> str:
@@ -14,7 +14,9 @@ def clean_html_data(data: str) -> str:
 
 def remove_none_values(item: Union[Dict, List]) -> dict | list[str] | list:
     if isinstance(item, dict):
-        return {k: remove_none_values(v) if v is not None else -1 for k, v in item.items()}
+        return {
+            k: remove_none_values(v) if v is not None else -1 for k, v in item.items()
+        }
     elif isinstance(item, list):
         return [remove_none_values(v) for v in item]
     else:
@@ -27,9 +29,10 @@ def get_stories_from_hackernews(query: str) -> str:
     :rtype: object
     """
     result = []
-    response = requests.get("http://hn.algolia.com/api/v1/search",
-                            params={"query": query.lower(),
-                                    "tags": "story"})
+    response = requests.get(
+        "http://hn.algolia.com/api/v1/search",
+        params={"query": query.lower(), "tags": "story"},
+    )
 
     if response.status_code == 200:
         response_data = response.json()
@@ -39,14 +42,22 @@ def get_stories_from_hackernews(query: str) -> str:
 
     # Find the first story with both 'num_comments' and 'objectID'
     first_valid_story_data = next(
-        (story for story in response_data['hits'] if 'num_comments' in story and 'objectID' in story), None)
+        (
+            story
+            for story in response_data["hits"]
+            if "num_comments" in story and "objectID" in story
+        ),
+        None,
+    )
 
     if first_valid_story_data:
         first_story = Story(**first_valid_story_data)
 
         # If the story has comments, fetch the top 10 comments
         if first_story.num_comments:
-            comment_response = requests.get(f"http://hn.algolia.com/api/v1/items/{first_story.objectID}")
+            comment_response = requests.get(
+                f"http://hn.algolia.com/api/v1/items/{first_story.objectID}"
+            )
             comment_data = comment_response.json()
 
             first_story_comments = Item(**comment_data)
@@ -70,9 +81,10 @@ def get_comments_from_hackernews(query: str) -> str:
     print(f"Query is {query}")
     result = []
     # Fetching stories related to the query "python"
-    response = requests.get("http://hn.algolia.com/api/v1/search",
-                            params={"query": query,
-                                    "tags": "comment"})
+    response = requests.get(
+        "http://hn.algolia.com/api/v1/search",
+        params={"query": query, "tags": "comment"},
+    )
     # Check if the request was successful
     if response.status_code == 200:
         data = response.json()
@@ -95,9 +107,7 @@ def get_comments_from_hackernews(query: str) -> str:
 def search_query_by_date(query: str) -> str:
     result = []
     base_url = "http://hn.algolia.com/api/v1/search_by_date"
-    params = {
-        "query": query
-    }
+    params = {"query": query}
     response = requests.get(base_url, params=params)
     if response.status_code == 200:
         data = response.json()

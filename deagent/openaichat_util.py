@@ -1,16 +1,18 @@
-from deagent.utils import chat_completion_request, summarize
 import json
-from deagent.hnapi import get_stories_from_hackernews, get_comments_from_hackernews, search_query_by_date
-from deagent.conversation import Conversation
 from typing import List
-import pprint
-from deagent.functions import *
+
+from deagent.hnapi import (
+    get_stories_from_hackernews,
+    get_comments_from_hackernews,
+    search_query_by_date,
+)
+from deagent.utils import chat_completion_request, summarize
 
 
 def chat_completion_with_function_execution(messages, functions: List[str] = [None]):
     """This function makes a ChatCompletion API call with the option of adding functions"""
     response = chat_completion_request(messages, functions)
-
+    print(f"Response from chat completion {response.json()}")
     if "choices" in response.json():
         full_message = response.json()["choices"][0]
         if full_message["finish_reason"] == "function_call":
@@ -18,7 +20,9 @@ def chat_completion_with_function_execution(messages, functions: List[str] = [No
             func_call_name = func_call["name"]
             func_call_arg = func_call["arguments"]
             # pprint(f"The Actual Function call \n{func_call}")
-            print(f"Function generation requested, calling function {func_call_name} args {func_call_arg}")
+            print(
+                f"Function generation requested, calling function {func_call_name} args {func_call_arg}"
+            )
             return call_hnapi_function(messages, full_message)
     else:
         print(f"Function not required, responding to user or no choices")
@@ -29,7 +33,10 @@ def call_hnapi_function(messages, full_message):
     """Function calling function which executes function calls when the model believes it is necessary.
     Currently extended by adding clauses to this if statement."""
 
-    if full_message["message"]["function_call"]["name"] == "get_stories_from_hackernews":
+    if (
+        full_message["message"]["function_call"]["name"]
+        == "get_stories_from_hackernews"
+    ):
         try:
             parsed_output = json.loads(
                 full_message["message"]["function_call"]["arguments"]
@@ -49,7 +56,10 @@ def call_hnapi_function(messages, full_message):
             print(type(e))
             raise Exception("Function chat request failed")
 
-    elif full_message["message"]["function_call"]["name"] == "get_comments_from_hackernews":
+    elif (
+        full_message["message"]["function_call"]["name"]
+        == "get_comments_from_hackernews"
+    ):
         parsed_output = json.loads(
             full_message["message"]["function_call"]["arguments"]
         )
@@ -70,6 +80,7 @@ def call_hnapi_function(messages, full_message):
             # return summary
     else:
         raise Exception("Function does not exist and cannot be called")
+
 
 # if __name__ == '__main__':
 #     hn_system_message = """You are a DataEngineering Agent, a helpful assistant reads hackernews to answer user questions.

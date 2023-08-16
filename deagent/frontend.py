@@ -1,17 +1,19 @@
 """Welcome to Pynecone! This file outlines the steps to create a basic app."""
-import reflex as rx
 import openai
+import reflex as rx
 
 openai.api_key = "YOUR_API_KEY"
 
 
 class State(rx.State):
     """The app state."""
+
     image_url = ""
     image_processing = False
     image_made = False
+
     def get_dalle_result(self, form_data: dict[str, str]):
-        prompt_text:str = form_data["prompt_text"]
+        prompt_text: str = form_data["prompt_text"]
         self.image_made = False
         self.image_processing = True
         yield
@@ -24,6 +26,7 @@ class State(rx.State):
         except:
             self.image_processing = False
             yield rx.window_alert("Error with OpenAI Execution.")
+
 
 def index():
     return rx.center(
@@ -60,6 +63,7 @@ def index():
         height="100vh",
         background="radial-gradient(circle at 22% 11%,rgba(62, 180, 137,.20),hsla(0,0%,100%,0) 19%),radial-gradient(circle at 82% 25%,rgba(33,150,243,.18),hsla(0,0%,100%,0) 35%),radial-gradient(circle at 25% 61%,rgba(250, 128, 114, .28),hsla(0,0%,100%,0) 55%)",
     )
+
 
 # Add state and page to the app.
 app = rx.App(state=State)

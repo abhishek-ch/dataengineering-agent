@@ -1,5 +1,6 @@
 from termcolor import colored
 
+
 class Conversation:
     def __init__(self):
         self.conversation_history = []
@@ -22,6 +23,3 @@ class Conversation:
                     role_to_color[message["role"]],
                 )
             )
-
-
-

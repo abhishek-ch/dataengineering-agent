@@ -1,23 +1,26 @@
 """Welcome to Reflex! This app is a demonstration of OpenAI's GPT."""
-import reflex as rx
-from .helpers import navbar
-import openai
 import datetime
+import os
+
+import openai
+import reflex as rx
+from dotenv import load_dotenv
+
 from deagent import style
 from deagent.conversation import Conversation
-from typing import Optional
-from deagent.openaichat_util import chat_completion_with_function_execution
 from deagent.functions import *
-# from deagent.state import *
+from deagent.openaichat_util import chat_completion_with_function_execution
+from .helpers import navbar
 
-openai.api_key = "sk-r"
-MAX_QUESTIONS = 10
-
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 class User(rx.Model, table=True):
     """A table for users in the database."""
+
     username: str
     password: str
+
 
 class Question(rx.Model, table=True):
     """A table for questions and answers in the database."""
@@ -30,6 +33,7 @@ class Question(rx.Model, table=True):
 
 class State(rx.State):
     """The app state."""
+
     show_columns = ["Question", "Answer"]
     username: str = ""
     password: str = ""
@@ -39,7 +43,6 @@ class State(rx.State):
     status: str = "DE Hackernews Agent"
     metastatus: str = "OpenAI Function Calling Demo"
     is_uploading: bool
-
 
     def ask_hn(self):
         self.is_uploading = True
@@ -64,7 +67,6 @@ class State(rx.State):
             print(e)
             return rx.window_alert("Error occured with OpenAI execution.")
 
-
     def save_result(self):
         with rx.session() as session:
             answer = Question(
@@ -78,6 +80,7 @@ class State(rx.State):
 
     def set_password(self, password):
         self.password = password.strip()
+
 
 def status():
     return rx.center(
@@ -98,6 +101,7 @@ def status():
         )
     )
 
+
 def index():
     return rx.center(
         navbar(State),
@@ -109,14 +113,13 @@ def index():
                         rx.progress(is_indeterminate=True, color="blue", width="100%"),
                         rx.progress(value=0, width="100%"),
                     ),
-
                     rx.text_area(
                         default_value=State.result,
                         placeholder="HN Result",
                         is_disabled=State.is_uploading,
                         width="100%",
                         height="90%",
-                        is_read_only=True
+                        is_read_only=True,
                     ),
                     shadow="lg",
                     padding="1em",
@@ -125,7 +128,6 @@ def index():
                     height="400px",
                 ),
                 width="100%",
-
             ),
             rx.center(
                 rx.vstack(
@@ -135,9 +137,11 @@ def index():
                             is_disabled=State.is_uploading,
                             style=style.input_style,
                             on_blur=State.set_prompt,
-                            width="100%"
+                            width="100%",
                         ),
-                        rx.button("Ask", style=style.button_style, on_click=State.ask_hn),
+                        rx.button(
+                            "Ask", style=style.button_style, on_click=State.ask_hn
+                        ),
                         width="500px",
                     )
                 ),

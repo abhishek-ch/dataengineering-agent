@@ -10,7 +10,7 @@ A specialized Data Engineering Agent designed to retrieve the most recent insigh
 ## How to Run?
 1. Checkout the project
 2. install `requirements.txt`
-3. Set OpenAI Key in deagent.py `openai.api_key`
+3. Set OpenAI Key as ENV variable `export OPENAI_API_KEY=sk_******`
 4. `reflex init`
 5. `reflex run`
 

@@ -5,7 +5,10 @@ def navbar(State):
     return rx.box(
         rx.hstack(
             rx.link(
-                rx.hstack(rx.image(src="abc2.ico"), rx.heading("Data Engineering Agent")), href="/"
+                rx.hstack(
+                    rx.image(src="abc2.ico"), rx.heading("Data Engineering Agent")
+                ),
+                href="/",
             ),
             # rx.menu(
             #     rx.menu_button(

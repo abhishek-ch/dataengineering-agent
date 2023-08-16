@@ -1,10 +1,13 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
+
+from pydantic import BaseModel
+
 
 class HighlightResult(BaseModel):
     value: str
     matchLevel: str
     matchedWords: List[str]
+
 
 class Hit(BaseModel):
     created_at: str
@@ -24,6 +27,7 @@ class Hit(BaseModel):
     objectID: str
     _highlightResult: Dict[str, HighlightResult]
 
+
 class HNResponse(BaseModel):
     hits: Optional[List[Hit]]
     nbHits: int
@@ -34,6 +38,7 @@ class HNResponse(BaseModel):
     query: str
     params: str
     processingTimeMS: int
+
 
 # Usage:
 # data = requests.get(URL).json()

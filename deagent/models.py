@@ -1,19 +1,22 @@
-from pydantic import BaseModel, Field
 from typing import List, Optional, Union
-import json
-from pydantic.json import pydantic_encoder
+
+from pydantic import BaseModel
+
 
 class HighlightResult(BaseModel):
     value: str
     matchLevel: str
     matchedWords: List[str]
 
+
 class UserHighlight(BaseModel):
     user: HighlightResult
+
 
 class StoryHighlight(BaseModel):
     title: HighlightResult
     url: HighlightResult
+
 
 class Comment(BaseModel):
     id: int
@@ -39,10 +42,12 @@ class Item(BaseModel):
     points: Optional[int]
     story_id: Optional[int]
     parent_id: Optional[int]
-    children: List[Union[Comment, 'Item']]  # Recursive
+    children: List[Union[Comment, "Item"]]  # Recursive
     _highlightResult: Optional[StoryHighlight]
 
+
 Item.update_forward_refs()
+
 
 class Story(BaseModel):
     # id: Optional[int]
@@ -77,5 +82,6 @@ class SearchResult(BaseModel):
     query: str
     params: str
     processingTimeMS: int
+
 
 # Comment.model_rebuild()

@@ -31,6 +31,7 @@ class Question(rx.Model, table=True):
 
 class State(rx.State):
     """The app state."""
+
     show_columns = ["Question", "Answer"]
     username: str = ""
     password: str = ""
@@ -66,20 +67,20 @@ class State(rx.State):
 
     def get_result(self):
         if (
-                rx.session()
-                        .query(Question)
-                        .where(Question.username == self.username)
-                        .where(Question.prompt == self.prompt)
-                        .first()
-                or rx.session()
-                .query(Question)
-                .where(Question.username == self.username)
-                .where(
-            Question.timestamp
-            > datetime.datetime.now() - datetime.timedelta(days=1)
-        )
-                .count()
-                > MAX_QUESTIONS
+            rx.session()
+            .query(Question)
+            .where(Question.username == self.username)
+            .where(Question.prompt == self.prompt)
+            .first()
+            or rx.session()
+            .query(Question)
+            .where(Question.username == self.username)
+            .where(
+                Question.timestamp
+                > datetime.datetime.now() - datetime.timedelta(days=1)
+            )
+            .count()
+            > MAX_QUESTIONS
         ):
             return rx.window_alert(
                 "You have already asked this question or have asked too many questions in the past 24 hours."

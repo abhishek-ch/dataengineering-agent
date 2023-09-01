@@ -90,7 +90,7 @@ class State(rx.State):
         self.checked = checked
         if self.checked:
             self.is_checked = "PDF Summary"
-            self.input_placeholder = "Summarize the PDF"
+            self.input_placeholder = "Summarize the PDF from the dir `pdfs`"
         else:
             self.is_checked = "HN Conversation!"
             self.input_placeholder = "Ask a question"

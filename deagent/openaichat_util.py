@@ -1,12 +1,13 @@
 import json
 from typing import List
-
+import pprint
 from deagent.hnapi import (
     get_stories_from_hackernews,
     get_comments_from_hackernews,
     search_query_by_date,
 )
-from deagent.utils import chat_completion_request, summarize
+from deagent.utils import chat_completion_request, summarize, pdf_summarize
+from deagent.pdfreader_util import process_pdf, summarize_chunk
 
 
 def chat_completion_with_function_execution(messages, functions: List[str] = [None]):
@@ -19,67 +20,61 @@ def chat_completion_with_function_execution(messages, functions: List[str] = [No
             func_call = full_message["message"]["function_call"]
             func_call_name = func_call["name"]
             func_call_arg = func_call["arguments"]
-            # pprint(f"The Actual Function call \n{func_call}")
-            print(
-                f"Function generation requested, calling function {func_call_name} args {func_call_arg}"
-            )
-            return call_hnapi_function(messages, full_message)
+            print(f"The Actual Function call \n{func_call} name: {func_call_name} args {func_call_arg}")
+            return call_hnapi_function(messages, full_message), func_call_name
     else:
         print(f"Function not required, responding to user or no choices")
-        return response.json()
+        return response["choices"][0]["message"], "No function Call"
 
 
-def call_hnapi_function(messages, full_message):
+def call_hnapi_function(messages, full_message) -> str:
     """Function calling function which executes function calls when the model believes it is necessary.
     Currently extended by adding clauses to this if statement."""
 
-    if (
-        full_message["message"]["function_call"]["name"]
-        == "get_stories_from_hackernews"
-    ):
-        try:
-            parsed_output = json.loads(
-                full_message["message"]["function_call"]["arguments"]
-            )
-            print("Getting search results")
-            results = get_stories_from_hackernews(parsed_output["query"])
-        except Exception as e:
-            print(parsed_output)
-            print(f"Function execution failed")
-            print(f"Error message: {e}")
+    func_name = full_message["message"]["function_call"]["name"]
+    parsed_output = json.loads(
+        full_message["message"]["function_call"]["arguments"]
+    )
+    match func_name:
+        case "process_pdf":
+            processed_result = summarize_chunk(process_pdf(parsed_output["pdf_name"]))
+            # print(f"processed_result ==> {processed_result}")
+            summary = pdf_summarize(parsed_output["pdf_name"], processed_result)
+            if summary:
+                result = summary["choices"][0]["message"]["content"]
+                return result
+        case "get_stories_from_hackernews":
+            try:
 
-        try:
-            print("Got search results, summarizing content")
-            response = chat_completion_request(messages)
-            return response.json()
-        except Exception as e:
-            print(type(e))
-            raise Exception("Function chat request failed")
+                print("Getting search results")
+                results = get_stories_from_hackernews(parsed_output["query"])
+            except Exception as e:
+                print(parsed_output)
+                print(f"Function execution failed")
+                print(f"Error message: {e}")
 
-    elif (
-        full_message["message"]["function_call"]["name"]
-        == "get_comments_from_hackernews"
-    ):
-        parsed_output = json.loads(
-            full_message["message"]["function_call"]["arguments"]
-        )
-        print("Extracting Comments")
-        full_news = get_comments_from_hackernews(parsed_output["query"])
-        return full_news
-    elif full_message["message"]["function_call"]["name"] == "search_query_by_date":
-        parsed_output = json.loads(
-            full_message["message"]["function_call"]["arguments"]
-        )
-        print("Extracting Comments")
-        full_result = search_query_by_date(parsed_output["query"])
-        print("Summarizing the Result")
+            try:
+                print("Got search results, summarizing content")
+                response = chat_completion_request(messages)
+                return response.json()
+            except Exception as e:
+                print(type(e))
+                raise Exception("Function chat request failed")
+        case "get_comments_from_hackernews":
+            print("Extracting Comments")
+            full_news = get_comments_from_hackernews(parsed_output["query"])
+            return full_news
+        case "search_query_by_date":
+            print("Extracting Comments")
+            full_result = search_query_by_date(parsed_output["query"])
+            print("Summarizing the Result")
 
-        summary = summarize(parsed_output["query"], full_result)
-        if summary:
-            return summary["choices"][0]["message"]["content"].replace("\n", "")
-            # return summary
-    else:
-        raise Exception("Function does not exist and cannot be called")
+            summary = summarize(parsed_output["query"], full_result)
+            if summary:
+                result = summary["choices"][0]["message"]["content"]
+                return result
+        case _:
+            raise NotImplemented("Function does not exist and cannot be called")
 
 
 # if __name__ == '__main__':

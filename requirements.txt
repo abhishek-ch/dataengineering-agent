@@ -6,3 +6,7 @@ termcolor
 python-dotenv
 streamlit
 reflex
+PyPDF2
+tqdm
+arxiv
+tiktoken

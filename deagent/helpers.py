@@ -35,6 +35,8 @@ def navbar(State):
             padding_x="2em",
             padding_y="1em",
             bg="rgba(255,255,255, 0.90)",
+            backdrop_filter="auto",
+            # p="4",
         ),
         position="fixed",
         width="100%",
